@@ -6,8 +6,8 @@
   "scripts": {
     "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
-    "live:device": "ionic emulate android -l --address 192.168.2.124 --device --target=516cd90b",
-    "live:emulator": "ionic emulate android -l --address 192.168.2.124 --emulator",
+    "live:device": "ionic emulate android -l --address 0.0.0.0 --device --target=516cd90b",
+    "live:emulator": "ionic emulate android -l --all --emulator",
     "ionic:build": "ionic-app-scripts build",
     "ionic:serve": "ionic-app-scripts serve"
   },

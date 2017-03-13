@@ -11,11 +11,11 @@ export class BaseController {
   } // constructor() {}
 
   public playSound(id, filename):Promise<any> {
-    if (location.protocol == 'http:') {
-      return new Promise((gg, ff) => {
-        gg('playSound(id, filename):Promise<any> {}: Playback is not allow on Desktop Browser at the moment.');
-      });
-    }
+    // if (location.protocol == 'http:') {
+    //   return new Promise((gg, ff) => {
+    //     gg('playSound(id, filename):Promise<any> {}: Playback is not allow on Desktop Browser at the moment.');
+    //   });
+    // }
 
     if (filename == '') {
       return new Promise((pass, skip) => {

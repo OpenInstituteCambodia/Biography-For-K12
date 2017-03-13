@@ -5,6 +5,7 @@ import { HelperPage } from '../helper/helper';
 
 import { BaseController } from '../../components/base';
 import { DebugController } from '../../components/debug';
+import { DatabaseController } from '../../components/db';
 
 @Component({
   selector: 'page-unit',
@@ -29,6 +30,8 @@ export class UnitPage {
   private imagePath: string;
   private animateOn;
   private hideAllExcept;
+
+  private database = new DatabaseController();
 
   private MediaPlayer = new BaseController();
   constructor(public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController, private platform: Platform, public modalCtrl: ModalController) {

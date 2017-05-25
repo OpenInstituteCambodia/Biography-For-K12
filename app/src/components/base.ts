@@ -8,14 +8,14 @@ export class BaseController {
   constructor() {
     let storage = window.localStorage;
     this.soundPath = storage.getItem('soundPath');
-  }
+  } // constructor() {}
 
   public playSound(id, filename):Promise<any> {
-    if (location.protocol == 'http:') {
-      return new Promise((gg, ff) => {
-        gg('playSound(id, filename):Promise<any> {}: Playback is not allow on Desktop Browser at the moment.');
-      });
-    }
+    // if (location.protocol == 'http:') {
+    //   return new Promise((gg, ff) => {
+    //     gg('playSound(id, filename):Promise<any> {}: Playback is not allow on Desktop Browser at the moment.');
+    //   });
+    // }
 
     if (filename == '') {
       return new Promise((pass, skip) => {
@@ -56,7 +56,7 @@ export class BaseController {
         reject(new Error('playSound(id, filename):Promise<any> {}: Promise Rejected: ' + error));
       });
     });
-  }
+  } // public playSound(id, filename):Promise<any> {}
 
   public stopSound(uri):Promise<any> {
     return new Promise((resolve, reject) => {
@@ -68,7 +68,7 @@ export class BaseController {
         reject(new Error("stopSound(): Something went wrong: " + err));
       });
     });
-  }
+  } // public stopSound(uri):Promise<any> {}
 
   public stopSoundComplex() {
     if (location.protocol == 'http:') {
@@ -85,5 +85,5 @@ export class BaseController {
         console.log("stopSoundComplex(): Something went wrong: ", err);
       });
     });
-  }
-}
+  } // public stopSoundComplex() {}
+} // export class BaseController {}

@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
-import { Platform, NavController, NavParams, AlertController, ToastController } from 'ionic-angular';
+import { Platform, NavController, NavParams, AlertController, ToastController, ModalController } from 'ionic-angular';
+import { IsDebug } from 'ionic-native';
+
 import { UnitPage } from '../unit/unit';
+import { DebugController } from '../../components/debug';
 
 @Component({
   selector: 'page-menu',
@@ -15,7 +18,8 @@ export class MenuPage {
   // Please don't do stupid stuff out side of this area ;)
 
   public menuID;
-  constructor(public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController, private platform: Platform, public toastCtrl: ToastController) {
+  private debugState = false;
+  constructor(public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController, private platform: Platform, public toastCtrl: ToastController, public modalCtrl: ModalController) {
     typeof this.navParams.get('menuID') == 'undefined' ? this.menuID = 'root' : this.menuID = this.navParams.get('menuID');
     typeof this.navParams.get('title') != 'undefined' ? this.menuTitle = this.navParams.get('title') : true;
   }
@@ -66,5 +70,23 @@ export class MenuPage {
       ]
     });
     alert.present();
+  }
+
+  private toggleDebug() {
+    this.debugState = true;
+    let debugModal = this.modalCtrl.create(DebugController, {
+      debugInterface: 'menu'
+    });
+    IsDebug.getIsDebug().then((isDebug) => {
+      if (isDebug) {
+        debugModal.present();
+      }
+    }).catch((err) => {
+      if (err == 'cordova_not_available') {
+        debugModal.present();
+      }else {
+        console.log('toggleDebug(): Something went wrong,', err);
+      }
+    });
   }
 }

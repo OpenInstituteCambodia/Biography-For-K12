@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
-import { Platform, NavController, NavParams, AlertController } from 'ionic-angular';
-import { NativeAudio } from 'ionic-native';
+import { Platform, NavController, NavParams, AlertController, ModalController } from 'ionic-angular';
+import { NativeAudio,IsDebug } from 'ionic-native';
 import { HelperPage } from '../helper/helper';
 
 import { BaseController } from '../../components/base';
+import { DebugController } from '../../components/debug';
+import { DatabaseController } from '../../components/db';
 
 @Component({
   selector: 'page-unit',
@@ -13,7 +15,7 @@ export class UnitPage {
   // The following Variable can be editable
   // --------------------------------------
   /* Delay in milliseconds */ private delay = 500;
-  /* Enable Animation Mode */ private isAnimateAllow = true;
+  /* Enable Animation Mode */ private isAnimateAllow = false;
   /* Delay Animation in milliseconds*/ private AnimateDelay = 500;
   /* Enable Helper Display Mode */ private isHelperAllow = true;
   // --------------------------------------
@@ -24,16 +26,26 @@ export class UnitPage {
   private content;
   public triggerState = "help";
   private triggerEnable = false;
+  private debugState = false;
+  private imagePath: string;
+  private animateOn;
+  private hideAllExcept;
+
+  private database = new DatabaseController();
 
   private MediaPlayer = new BaseController();
-  constructor(public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController, private platform: Platform) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController, private platform: Platform, public modalCtrl: ModalController) {
     this.unitID = this.navParams.get('unitID');
     typeof this.navParams.get('unitTitle') != 'undefined' ? this.unitTitle = this.navParams.get('unitTitle') : '';
+
+    let storage = window.localStorage;
+    this.imagePath = storage.getItem('imagePath');
   }
 
   // The following Function can be editable
   // --------------------------------------
     private replayButtonClick() {
+      this.triggerAnimate('reset', 0);
       this.startUnitIntro();
     }
 
@@ -49,12 +61,15 @@ export class UnitPage {
       correct == choice ? statusURL = this.content['answer_correct_audio'] : statusURL = this.content['answer_wrong_audio'];
       correct == choice ? UnitNextAllow  = true : UnitNextAllow  = false;
 
+      this.triggerAnimate('stage1', choice);
+
       setTimeout(() => {
         correct == choice ? this.triggerState = "happy" : this.triggerState = "sad";
       }, this.isHelperAllow == true ? this.AnimateDelay : 0);
 
       this.MediaPlayer.playSound('choice', playbackURL).then((stage1) => {
         console.log(stage1);
+        this.triggerAnimate('stage2', choice);
         return new Promise((h, n) => {
           setTimeout(() => {
             h('HelperPage: Is Enabled, navigating...');
@@ -144,8 +159,10 @@ export class UnitPage {
   }
 
   ionViewWillLeave() {
-    console.log("ionViewWillLeave(): View is about to leave, Stopping current playback sound.");
-    this.MediaPlayer.stopSoundComplex();
+    if (this.debugState == false) {
+      console.log("ionViewWillLeave(): View is about to leave, Stopping current playback sound.");
+      this.MediaPlayer.stopSoundComplex();
+    }
   }
 
   private Q(parent, attr) {
@@ -156,6 +173,28 @@ export class UnitPage {
       arrtData = parentData.getAttribute(attr);
     }
     return arrtData;
+  }
+
+  private triggerAnimate(property, option) {
+    switch(property) {
+      case 'stage1': // hide other options
+        this.hideAllExcept = option;
+        break;
+
+      case 'stage2': // expand current option
+        this.animateOn = option;
+        break;
+
+      case 'stage3':
+        break;
+
+      case 'reset':
+        this.hideAllExcept = null;
+        this.animateOn = null;
+        break;
+
+    }
+    console.log("private triggerAnimate("+property+", "+option+") {}");
   }
 
   private backButtonClick(){
@@ -196,6 +235,25 @@ export class UnitPage {
       ]
     });
     alert.present();
+  }
+
+  private toggleDebug() {
+    this.debugState = true;
+    let debugModal = this.modalCtrl.create(DebugController, {
+      debugInterface: 'unit',
+      unitContent: this.content
+    });
+    IsDebug.getIsDebug().then((isDebug) => {
+      if (isDebug) {
+        debugModal.present();
+      }
+    }).catch((err) => {
+      if (err == 'cordova_not_available') {
+        debugModal.present();
+      }else {
+        console.log('toggleDebug(): Something went wrong,', err);
+      }
+    });
   }
 
 }
